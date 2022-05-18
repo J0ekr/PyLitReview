@@ -6,5 +6,5 @@
 - usage: crawl(keywords, "Library", Titlesearch_boolean)
 
 ## ToDos
-- [ ] Implemnent title+abstractsearch
+- [ ] Implement title+abstractsearch
 - [ ] Update Sciencedirect crawler
