@@ -5,10 +5,16 @@
 - Download Chromdriver with same version as current Google Chrome installation
 - Put info into config_template.py and rename to config.py
 - Create keywords 
-- usage: crawl(keywords, "Library", Titlesearch_boolean)
-  - Library options: "IEEE", "ACM", "ScienceDirect" (currently not working)
-  - Titlesearch options: True, False
+- usage: crawl(keywords, "Library", searchWhere)
+  - Library options: 
+    - "IEEE" 
+    - "ACM" 
+    - "ScienceDirect" (Not working headless)
+  - searchWhere options: 
+    - "tit" (Title only) 
+    - "titAbs" (Title and Abstract) 
+    - "text" (All)
 
 ## ToDos
-- [ ] Implement title+abstractsearch
-- [ ] Update Sciencedirect crawler
+- [x] Implement title+abstractsearch 
+- [x] Update Sciencedirect crawler
