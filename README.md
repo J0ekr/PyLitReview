@@ -4,3 +4,7 @@
 - Put info in config_template.py and rename to config.py
 - Create keywords 
 - usage: crawl(keywords, "Library", Titlesearch_boolean)
+
+## ToDos
+- [ ] Implemnent title+abstractsearch
+- [ ] Update Sciencedirect crawler
