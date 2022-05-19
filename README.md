@@ -1,5 +1,6 @@
 # PyLitReview
-
+19.05.2022:
+Updated for Python 3.10 usage (Fixed deprecated selenium code and added enums & match cases)
 ## Quick Guide
 - Install Selenium
 - Download Chromdriver with same version as current Google Chrome installation
