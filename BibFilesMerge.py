@@ -10,8 +10,7 @@ from pybtex.database import BibliographyData, Entry
 import unidecode
 import argparse
 import csv
-from html.parser import HTMLParser
-htmlParser = HTMLParser()
+import html
 
 mergedCont = 0 
 
@@ -104,7 +103,7 @@ def getEntryAbstractStr(entry):
         # abstract = str(entry.fields['abstract'])
         abstract = entry.fields['abstract']
     if (abstract != ''):
-        abstract = htmlParser.unescape(abstract).replace('\\%','%')
+        abstract = html.unescape(abstract).replace('\\%','%')
     return abstract
 
 def cleanStringToCompare(xStr):
