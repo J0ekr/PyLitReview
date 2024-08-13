@@ -314,6 +314,7 @@ def saveACMBib(driver, infos, outputFolderBib):
 
     if (r > acm_maxpage):
         print_debug(f'Warning: Too many results for ACM search: {"".join(infos["Keyword"])}, only downloading the first {acm_maxpage} pages', 0)
+        return False, url
     
     # Loop through all pages and save resulting bib files
     for i in tqdm.tqdm(range(r), desc="pages"):
@@ -738,7 +739,8 @@ def saveScienceDirectBib(driver, infos, outputFolderBib): #keywords_list, output
 
     if (r > sd_maxpage):
         print_debug(f'Warning: Too many results for ScienceDirect search: {"".join(infos["Keyword"])}, only downloading the first {sd_maxpage} pages', 0)
-
+        return False, url
+    
     for i in tqdm.tqdm(range(r), desc="pages"):
         # driver = setupCrawler(dl_folder)
         toOpen = url + str(i*50)
