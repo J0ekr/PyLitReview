@@ -281,11 +281,11 @@ def saveACMBib(driver, infos, outputFolderBib):
     
     successElement, navbar = getElement(driver, by=By.CLASS_NAME, value="search-result__nav-container", number=0)
     if not successElement:
-        return False, url
+        return False, url, -1
     
     successElement, navelements = getElement(navbar, by=By.XPATH, value=".//*", number=None)
     if not successElement:
-        return False, url
+        return False, url, -1
         
     foundResults = False
     for nav_element in navelements:
@@ -294,27 +294,27 @@ def saveACMBib(driver, infos, outputFolderBib):
             
     if foundResults == False: 
         print_debug("Only people in results - next keyword", 2)
-        return False, url
+        return False, url, -1
     
     save_screenshot(driver, infos)
 
-    successElement, results = getElement(driver, by=By.CLASS_NAME, value="result__count", number=0)
+    successElement, searchResultCount = getElement(driver, by=By.CLASS_NAME, value="result__count", number=0)
     if not successElement:
-        return False, url
+        return False, url, -1
 
-    results = results.text.split(" ")[0]
-    if "," in results:
-        results = results.replace(",", "")
-    results = int(results)
+    searchResultCount = searchResultCount.text.split(" ")[0]
+    if "," in searchResultCount:
+        searchResultCount = searchResultCount.replace(",", "")
+    searchResultCount = int(searchResultCount)
     
-    if results == 0:
-        return True, url
+    if searchResultCount == 0:
+        return True, url, searchResultCount
     
-    r = np.min([math.ceil(results / 50), acm_maxpage])
+    r = np.min([math.ceil(searchResultCount / 50), acm_maxpage])
 
     if (r > acm_maxpage):
         print_debug(f'Warning: Too many results for ACM search: {"".join(infos["Keyword"])}, only downloading the first {acm_maxpage} pages', 0)
-        return False, url
+        return False, url, searchResultCount
     
     # Loop through all pages and save resulting bib files
     for i in tqdm.tqdm(range(r), desc="pages"):
@@ -344,9 +344,9 @@ def saveACMBib(driver, infos, outputFolderBib):
                 print_debug(f'Wait for file ACM bib file.', 2)
             os.rename(tmpFile, getFileNameOutput(infos, outputFolderBib, i))
         else:
-            return False, url
+            return False, url, searchResultCount
             
-    return True, url
+    return True, url, searchResultCount
 
 def getURLIEEE(infos):
     """
@@ -584,28 +584,30 @@ def saveIEEEBib(driver, infos, outputFolderBib):
     save_screenshot(driver, infos)
 
     
-    serachResultCount = -1
+    searchResultCount = -1
     successElement, element = getElement(driver, by=By.CLASS_NAME, value="Dashboard-header", number=0)
     if (successElement):
         successElement, element = getElement(element, by=By.TAG_NAME, value="span", number=0)
         if (successElement):
             if (element.text == "No results found"):
-                serachResultCount = 0
+                searchResultCount = 0
             else:
                 successElement, element = getElement(element, by=By.TAG_NAME, value="span", number=1)
                 if successElement:
-                    serachResultCount = int(element.text)
+                    searchResultCount = int(element.text)
                 else:
-                    return False, url
+                    return False, url, searchResultCount
         else:
-            return False, url
+            return False, url, searchResultCount
     else:
-        return False, url
+        return False, url, searchResultCount
             
-    if serachResultCount == 0:
-        return True, url
+    if searchResultCount == 0:
+        return True, url, searchResultCount
     
-    r = int(np.min([math.ceil(serachResultCount / 50), ieee_maxpage]))
+    r = int(np.min([math.ceil(searchResultCount / 50), ieee_maxpage]))
+
+    return True, url, searchResultCount
 
     for i in tqdm.tqdm(range(r), desc="pages"):
         toOpen = url + str(i+1)
@@ -615,11 +617,11 @@ def saveIEEEBib(driver, infos, outputFolderBib):
         if success:
             os.rename(pathToDownloadedFile, getFileNameOutput(infos, outputFolderBib, i))
         else:
-            return False, url
+            return False, url, searchResultCount
 
         time.sleep(2)
         
-    return True, url
+    return True, url, searchResultCount
 
 def getURLScienceDirect(infos):
     """
@@ -726,29 +728,29 @@ def saveScienceDirectBib(driver, infos, outputFolderBib): #keywords_list, output
     driver.get(url)
     time.sleep(3)
     try:
-        results = driver.find_element(by=By.CLASS_NAME, value="search-body-results-text")
-        results = results.text.split(" ")[0]
-        if "," in results:
-            results = results.replace(",", "")
-        results = int(results)
+        searchResultCount = driver.find_element(by=By.CLASS_NAME, value="search-body-results-text")
+        searchResultCount = searchResultCount.text.split(" ")[0]
+        if "," in searchResultCount:
+            searchResultCount = searchResultCount.replace(",", "")
+        searchResultCount = int(searchResultCount)
     except NoSuchElementException:
-        results = 0
+        searchResultCount = 0
 
-    r = np.min([math.ceil(results / 50), sd_maxpage])
+    r = np.min([math.ceil(searchResultCount / 50), sd_maxpage])
 
 
     if (r > sd_maxpage):
         print_debug(f'Warning: Too many results for ScienceDirect search: {"".join(infos["Keyword"])}, only downloading the first {sd_maxpage} pages', 0)
-        return False, url
+        return False, url, searchResultCount
     
     for i in tqdm.tqdm(range(r), desc="pages"):
         # driver = setupCrawler(dl_folder)
         toOpen = url + str(i*50)
         success = loadScienceDirectBib(toOpen, driver)
         if not success:
-            return False, url
+            return False, url, searchResultCount
 
-    return True, url
+    return True, url, searchResultCount
 
 
 def setupCrawler(targetLibrary, outputFolderBib):
@@ -803,13 +805,13 @@ def crawl(infos, outputFolderBib):
     print_debug(f'Start crawling {infos["Library"]}', 1)
         
     if infos["Library"] == Library.ACM:
-        success, url = saveACMBib(driver, infos, outputFolderBib)
+        success, url, searchResultCount = saveACMBib(driver, infos, outputFolderBib)
     elif infos["Library"] == Library.IEEE:
-        success, url = saveIEEEBib(driver, infos, outputFolderBib)
+        success, url, searchResultCount = saveIEEEBib(driver, infos, outputFolderBib)
     elif infos["Library"] == Library.ScienceDirect:
         keyword = [item.replace(" ", "%20") for item in keyword]
-        success, url = saveScienceDirectBib(driver, infos, outputFolderBib)
+        success, url, searchResultCount = saveScienceDirectBib(driver, infos, outputFolderBib)
     else:
         print_debug(f'Error: Library {infos["Library"]} not yet supported', 0)
         
-    return success, url
+    return success, url, searchResultCount
