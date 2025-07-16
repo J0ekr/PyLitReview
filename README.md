@@ -1,23 +1,12 @@
 # PyLitReview
 19.05.2022:
 Updated for Python 3.10 usage (Fixed deprecated selenium code and added enums & match cases)
-## Quick Guide
-- Install Selenium
-- Download Chromdriver with same version as current Google Chrome installation
-- Put info into config_template.py and rename to config.py
-- Create keywords 
-- usage: crawl(keywords, Library.library, SearchWhere.searchWhere)
-  - keywords must be a list of lists of strings
-  - library options: 
-    - IEEE 
-    - ACM 
-    - ScienceDirect (Not working headless)
-  - searchWhere options: 
-    - Title 
-    - TitleAbstract (Title OR Abstract - not working for ACM) 
-    - Abstract 
-    - Text (All)
 
-## ToDos
-- [x] Implement title+abstractsearch 
-- [x] Update Sciencedirect crawler
+## Installation
+* Install Selenium
+* Download Chromdriver with same version as current Google Chrome installation
+  + You might need to have undetected_chromedriver installed to do `import undetected_chromedriver as uc` in case you get blocked
+
+## Getting Started
+* Define your job using `PyLitReview_GenerateJob`
+* Run the crawling jobs using `PyLitReview_Crawler`
